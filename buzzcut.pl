@@ -82,12 +82,12 @@ while(<$diff_file>){
 		if($cuff_format){
 
 			#Store Gene_ID in array if Fold Change is significant
-			if($line[9] >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
+			if(abs($line[9]) >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
 
 		} else {
 
 			#Store Gene ID in array if Fold Change is significant in EBSeq
-			if($line[4] >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
+			if(abs(log($line[4])/log(2)) >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
 
 		}
 	
@@ -97,12 +97,12 @@ while(<$diff_file>){
 		if($cuff_format){
 
 			#Store Gene_ID in array if both P-value and Fold Change are significant
-			if($line[11] <= $p_value and $line[9] >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
+			if($line[11] <= $p_value and abs($line[9]) >= $fold) { $sig_genes[scalar @sig_genes] = "$line[0]"; }
 
 		} else {
 
 			#Store Gene_ID in array if both P-value and Fold Change are significant in EBSeq
-			if($line[1] <= $p_value and $line[4] >= $fold){ $sig_genes[scalar @sig_genes] = "$line[0]"; }
+			if($line[1] <= $p_value and abs(log($line[4])/log(2)) >= $fold){ $sig_genes[scalar @sig_genes] = "$line[0]"; }
 
 		}
 
@@ -153,17 +153,17 @@ while(<$count_file>){
 					
 					$finishFirstMatch = 1;
 
-					#Print line to output file
-					print $output "tracking_ID\t";
-
-					for(my $i = 0; $i < scalar @firstMatchSamples; $i++){
-						print $output "$firstMatchSamples[$i]";
-						if($i < scalar @firstMatchSamples - 1){
-							print $output "\t";
-						} else {
-							print $output "\n";
-						}
-					}
+#					#Print line to output file
+#					print $output "tracking_ID\t";
+#
+#					for(my $i = 0; $i < scalar @firstMatchSamples; $i++){
+#						print $output "$firstMatchSamples[$i]";
+#						if($i < scalar @firstMatchSamples - 1){
+#							print $output "\t";
+#						} else {
+#							print $output "\n";
+#						}
+#					}
 
 					print $output "$sig_genes[$j]\t";
 
@@ -235,16 +235,16 @@ while(<$count_file>){
 		if($line[0] =~ /\A\Z/){
 
 			#Print line to output file
-			print $output "Gene_ID\t";
-
-			for(my $i = 1; $i < scalar @line; $i++){
-				print $output "$line[$i]";
-				if($i < scalar @line - 1){
-					print $output "\t";
-				} else {
-					print $output "\n";
-				}
-			}
+#			print $output "Gene_ID\t";
+#
+#			for(my $i = 0; $i < scalar @line; $i++){
+#				print $output "$line[$i]";
+#				if($i < scalar @line - 1){
+#					print $output "\t";
+#				} else {
+#					print $output "\n";
+#				}
+#			}
 
 		} else {
 
@@ -265,6 +265,10 @@ while(<$count_file>){
 						print $output "\n";
 					}
 				}
+
+				$j++;
+
+			} elsif($line[0] gt $sig_genes[$j]){
 
 				$j++;
 
